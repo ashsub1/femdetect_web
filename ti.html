@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PCOS Doctor Console</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* Background image with 50% opacity */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("hi.jpg") no-repeat center center/cover;
+      opacity: 0.5;
+      z-index: -1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #1a1a1a;
+      border-bottom: 1px solid #333;
+    }
+    header h1 {
+      font-size: 18px;
+    }
+    .logout {
+      background: none;
+      border: 1px solid #555;
+      border-radius: 6px;
+      color: #fff;
+      padding: 5px 12px;
+      cursor: pointer;
+    }
+    nav {
+      display: flex;
+      gap: 5px;
+      padding: 10px 20px;
+    }
+    nav button {
+      background: #222;
+      border: none;
+      padding: 10px 20px;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    nav button.active {
+      background: #ff6600;
+    }
+    main {
+      padding: 20px;
+    }
+    .card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      padding: 10px;
+      text-align: left;
+    }
+    table tr {
+      border-bottom: 1px solid #333;
+    }
+    .status, .risk, .btn {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .risk.high { background: #802000; }
+    .risk.low { background: #264d26; }
+    .risk.moderate { background: #664d26; }
+    .status.approved { background: #333; }
+    .btn {
+      background: #ff6600;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+    .input-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #111;
+      color: #fff;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    .gallery-card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PCOS Doctor Console</h1>
+    <button class="logout">Logout</button>
+  </header>
+  
+  <nav>
+    <button class="active" onclick="showTab('patients')">Patients</button>
+    <button onclick="showTab('appointments')">Appointments</button>
+    <button onclick="showTab('imaging')">Imaging</button>
+    <button onclick="showTab('reports')">Reports</button>
+  </nav>
+  
+  <main>
+    <!-- Patients -->
+    <section id="patients" class="tab-content">
+      <div class="card">
+        <h2>Patient Queue</h2>
+        <table>
+          <tr><th>Patient</th><th>Age</th><th>Cycle</th><th>Risk</th><th>Last Test</th><th>Status</th><th></th></tr>
+          <tr>
+            <td>Aisha Verma</td><td>23</td><td>Irregular (40–55 days)</td>
+            <td><span class="risk high">High • 78%</span></td>
+            <td>2025-08-19</td><td><span class="status approved">Approved</span></td>
+            <td><button class="btn">Review</button></td>
+          </tr>
+          <tr>
+            <td>Nisha Rao</td><td>27</td><td>Regular (28–31 days)</td>
+            <td><span class="risk low">Low • 18%</span></td>
+            <td>2025-08-19</td><td>Pending Review</td>
+            <td><button class="btn">Review</button></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+    
+    <!-- Appointments -->
+    <section id="appointments" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2>Upcoming Appointments</h2>
+        <table>
+          <tr><th>Patient</th><th>Date & Time</th><th>Type</th><th>USG</th><th>Status</th></tr>
+          <tr><td>Aisha Verma</td><td>2025-08-20 05:06</td><td>Consultation</td><td>No</td><td>Booked</td></tr>
+          <tr><td>Sneha Iyer</td><td>2025-08-21 05:06</td><td>Consultation</td><td>Yes</td><td>Booked</td></tr>
+        </table>
+      </div>
+    </section>
+    
+    <!-- Imaging -->
+    <!-- Imaging -->
+<section id="imaging" class="tab-content" style="display:none;">
+  <div class="card">
+    <h2>Screening Test Link</h2>
+    <div class="input-box">
+      <input type="text" id="hf-link" value="">
+      <button class="btn" onclick="saveLink()">Save</button>
+    </div>
+    <button class="btn" style="margin-top:10px;" onclick="launchScreening()">Launch Screening</button>
+  </div>
+</section>
+
+<script>
+  // Load link from localStorage when page loads
+  window.onload = function() {
+    const savedLink = localStorage.getItem("hfLink");
+    if (savedLink) {
+      document.getElementById("hf-link").value = savedLink;
+    } else {
+      // Default value if nothing saved yet
+      document.getElementById("hf-link").value = "https://huggingface.co/spaces/ashsub/project_demo";
+    }
+  }
+
+  function saveLink() {
+    const link = document.getElementById("hf-link").value;
+    localStorage.setItem("hfLink", link);
+    alert("Link saved: " + link);
+  }
+
+  function launchScreening() {
+    const link = document.getElementById("hf-link").value;
+    window.open(link, "_blank"); // Opens in a new tab
+  }
+</script>
+
+      <div class="card">
+        <h2>PCOD Screening Gallery (Sample)</h2>
+        <div class="gallery">
+          <div class="gallery-card">
+            <p><span class="risk high">High • 72%</span></p>
+            <p>Right Ovary – multifollicular</p>
+            <button class="btn">View</button> <button class="btn">Select</button>
+          </div>
+          <div class="gallery-card">
+            <p><span class="risk high">High • 81%</span></p>
+            <p>Left Ovary – string of pearls</p>
+            <button class="btn">View</button> <button class="btn">Select</button>
+          </div>
+          <div class="gallery-card">
+            <p><span class="risk low">Low • 35%</span></p>
+            <p>Endometrium view</p>
+            <button class="btn">View</button> <button class="btn">Select</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Reports -->
+    <section id="reports" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2>Finalized Reports</h2>
+        <div class="card">
+          <h3>Aisha Verma <span class="risk high">High • 78%</span></h3>
+          <p>19/8/2025, 2:46:11 pm</p>
+          <p>Patient Aisha Verma: Risk 78%.</p>
+          <button class="btn">Print</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
+      document.getElementById(tabId).style.display = "block";
+      document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+
+    // Redirect logout button
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelector(".logout").addEventListener("click", () => {
+        window.location.href = "2.html"; // redirect to login page
+      });
+    });
+  </script>
+</body>
+</html>
